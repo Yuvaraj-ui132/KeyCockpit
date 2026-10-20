@@ -30,15 +30,24 @@ class Client:
                  "query_string": b"", "headers": headers, "client": ("test", 1),
                  "server": ("test", 80)}
         out = {"status": None, "body": b""}
+        request_received = False
+        response_complete = asyncio.Event()
 
         async def receive():
-            return {"type": "http.request", "body": payload, "more_body": False}
+            nonlocal request_received
+            if not request_received:
+                request_received = True
+                return {"type": "http.request", "body": payload, "more_body": False}
+            await response_complete.wait()
+            return {"type": "http.disconnect"}
 
         async def send(message):
             if message["type"] == "http.response.start":
                 out["status"] = message["status"]
             elif message["type"] == "http.response.body":
                 out["body"] += message.get("body", b"")
+                if not message.get("more_body", False):
+                    response_complete.set()
 
         asyncio.run(self.app(scope, receive, send))
         try:
