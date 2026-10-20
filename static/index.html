@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KeyCockpit</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #0e1116; --panel: #171b22; --panel2: #1e232c; --line: #2b323d;
+    --text: #e8ecf1; --muted: #8b95a5; --accent: #4cc9a7; --bad: #ff6b6b; --warn: #f5b942;
+    --screen: #0a0d12; --screen-text: #e8ecf1;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex;
+           align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: .3px; }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+  main { display: grid; gap: 16px; padding: 16px 24px 32px; max-width: 1200px; margin: 0 auto;
+         grid-template-columns: 1.1fr 1fr; }
+  @media (max-width: 880px) { main { grid-template-columns: 1fr; padding: 16px; } }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  section h2 { margin: 0 0 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px;
+               color: var(--muted); font-weight: 600; }
+  .wide { grid-column: 1 / -1; }
+  /* cockpit screen */
+  #screen { background: var(--screen); color: var(--screen-text); border-radius: 14px; padding: 18px;
+            border: 1px solid var(--line); min-height: 250px; transition: background .4s, color .4s; }
+  #screen.day { --screen: #e9eef5; --screen-text: #151a22; }
+  .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { padding: 3px 10px; border-radius: 999px; font-size: 12px; border: 1px solid currentColor;
+          opacity: .85; }
+  .chip.ok { color: var(--accent); } .chip.bad { color: var(--bad); } .chip.warn { color: var(--warn); }
+  .chip.off { color: var(--muted); }
+  #greeting { font-size: 22px; font-weight: 600; margin: 2px 0 10px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tile { background: rgba(127,127,127,.12); border-radius: 10px; padding: 10px 12px; min-height: 64px; }
+  .tile .k { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: .6; }
+  .tile .v { font-size: 16px; margin-top: 2px; word-break: break-word; }
+  .bar { height: 6px; background: rgba(127,127,127,.25); border-radius: 4px; margin-top: 8px; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+  /* controls */
+  .phone { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;
+           background: var(--panel2); }
+  .phone .who { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .phone .who b { font-size: 15px; } .role { color: var(--muted); font-size: 12px; }
+  button { font: inherit; font-size: 13px; color: var(--text); background: #262d38; border: 1px solid var(--line);
+           border-radius: 8px; padding: 6px 10px; cursor: pointer; margin: 0 4px 6px 0; }
+  button:hover { border-color: var(--accent); } button:active { transform: translateY(1px); }
+  button.danger:hover { border-color: var(--bad); color: var(--bad); }
+  button.cast { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .st-active { color: var(--accent); } .st-revoked { color: var(--bad); } .st-expired { color: var(--warn); }
+  #toast { min-height: 40px; padding: 10px 12px; border-radius: 8px; background: var(--panel2);
+           border-left: 4px solid var(--muted); margin-bottom: 12px; font-size: 14px; }
+  #toast.ok { border-color: var(--accent); } #toast.bad { border-color: var(--bad); }
+  .log { font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; max-height: 260px; overflow: auto; }
+  .log div { padding: 2px 0; border-bottom: 1px dashed var(--line); white-space: pre; }
+  .log .y { color: var(--accent); } .log .n { color: var(--bad); }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>KeyCockpit</h1>
+  <p>Phone-as-a-key + digital cockpit simulator. Real signatures, simulated radio and car.</p>
+</header>
+
+<main>
+  <section>
+    <h2>Digital cockpit</h2>
+    <div id="screen" class="night">
+      <div class="status-row" id="chips"></div>
+      <div id="greeting">Car is locked</div>
+      <div class="grid2">
+        <div class="tile"><div class="k">Seat position</div><div class="v" id="seat">-</div>
+          <div class="bar"><i id="seatbar" style="width:0%"></i></div></div>
+        <div class="tile"><div class="k">Cabin / music</div><div class="v" id="cabin">-</div></div>
+        <div class="tile"><div class="k">Navigation (from phone)</div><div class="v" id="nav">-</div></div>
+        <div class="tile"><div class="k">Media / call (from phone)</div><div class="v" id="media">-</div></div>
+      </div>
+    </div>
+    <p class="hint">The cockpit loads the profile of whoever's key unlocked the car. Phone content
+      appears only while that phone's engine session is active.</p>
+  </section>
+
+  <section>
+    <h2>Phones</h2>
+    <div id="toast">Press a button on a phone to start.</div>
+    <div id="phones"></div>
+  </section>
+
+  <section>
+    <h2>Owner: keys and car connectivity</h2>
+    <table><thead><tr><th>Holder</th><th>Role</th><th>Status</th><th></th></tr></thead>
+      <tbody id="keys"></tbody></table>
+    <p style="margin-top:12px">
+      <button id="onlineBtn"></button>
+    </p>
+    <p class="hint">Revoke while the car is online: blocked at once. Take the car offline first and
+      it keeps trusting the key until it syncs (or the key expires). That is why keys are short-lived.</p>
+  </section>
+
+  <section>
+    <h2>Attack lab</h2>
+    <button data-attack="replay">Replay captured unlock</button>
+    <button data-attack="relay">Relay attack</button>
+    <button data-attack="forged_cert">Forged certificate</button>
+    <button data-attack="stolen_cert">Stolen certificate</button>
+    <p class="hint">Each button is a real attempt against the car's real checks. "Replay" needs one
+      successful press first (it re-sends that message).</p>
+  </section>
+
+  <section class="wide">
+    <h2>Audit log (what the car decided)</h2>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+
+<script>
+let vehicleId = null, ownerToken = null, phones = [], online = true;
+const $ = (id) => document.getElementById(id);
+
+async function api(method, path, body, token) {
+  const headers = {};
+  if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (token) headers["Authorization"] = "Bearer " + token;
+  const res = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  return { status: res.status, data };
+}
+
+function el(tag, props = {}, ...kids) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") node.className = v; else if (k === "text") node.textContent = v;
+    else if (k.startsWith("on")) node.addEventListener(k.slice(2), v); else node.setAttribute(k, v);
+  }
+  kids.forEach((kid) => node.append(kid));
+  return node;
+}
+
+function toast(text, ok) { const t = $("toast"); t.textContent = text; t.className = ok ? "ok" : "bad"; }
+
+const COMMANDS = [["unlock","Unlock"],["lock","Lock"],["open_trunk","Trunk"],["open_glovebox","Glovebox"],["start","Start"],["stop","Stop"]];
+const CAST = {
+  Alice: { nav: { destination: "Kamal Basti, Belagavi", eta_min: 14 }, media: { title: "Evening Drive", artist: "Indie Playlist" }, call: { name: "Mom" } },
+  Bob:   { nav: { destination: "Belagavi Fort", eta_min: 9 }, media: { title: "Road Trip Mix", artist: "Bollywood Hits" }, call: { name: "" } },
+  Valet: { nav: { destination: "Parking bay 3", eta_min: 2 }, media: { title: "", artist: "" }, call: { name: "" } },
+};
+
+async function press(name, command) {
+  const { data } = await api("POST", `/api/demo/phones/${name}/press`, { command });
+  toast(`${name} → ${command}: ` + (data.ok ? "OK" : "DENIED (" + data.reason + ")"), data.ok);
+  refresh();
+}
+
+async function cast(name) {
+  const { status, data } = await api("POST", `/api/demo/phones/${name}/project`, CAST[name]);
+  toast(status === 200 ? `${name}'s phone is now projecting to the cockpit` : (data.error || "failed"), status === 200);
+  refresh();
+}
+
+async function attack(kind) {
+  const { status, data } = await api("POST", `/api/demo/attacks/${kind}`);
+  if (status !== 200) { toast(data.error || "attack failed to run", false); return; }
+  toast(`Attacker ${data.what}: ` + (data.blocked ? "BLOCKED (" + data.reason + ")" : "SUCCEEDED"), data.blocked);
+  refresh();
+}
+
+function buildPhones() {
+  const box = $("phones"); box.replaceChildren();
+  for (const p of phones) {
+    const row = el("div", { class: "phone" },
+      el("div", { class: "who" }, el("b", { text: p.name + "'s phone" }), el("span", { class: "role", text: p.role })));
+    for (const [cmd, label] of COMMANDS) row.append(el("button", { text: label, onclick: () => press(p.name, cmd) }));
+    row.append(el("button", { class: "cast", text: "Cast to car", onclick: () => cast(p.name) }));
+    box.append(row);
+  }
+}
+
+function renderKeys(keys) {
+  const body = $("keys"); body.replaceChildren();
+  for (const k of keys) {
+    const act = k.status === "active"
+      ? el("button", { class: "danger", text: "Revoke", onclick: async () => {
+          const { data } = await api("DELETE", `/api/vehicles/${vehicleId}/keys/${k.key_id}`, undefined, ownerToken);
+          toast(data.car_updated ? `Revoked ${k.holder}'s key; the car has the new list.` : `Revoked ${k.holder}'s key, but the car is OFFLINE and still trusts it.`, data.car_updated);
+          refresh();
+        } })
+      : el("span");
+    body.append(el("tr", {}, el("td", { text: k.holder }), el("td", { text: k.role }),
+      el("td", { class: "st-" + k.status, text: k.status }), el("td", {}, act)));
+  }
+}
+
+function chip(text, cls) { return el("span", { class: "chip " + cls, text }); }
+
+function renderCockpit(c) {
+  const car = c.car, scr = $("screen");
+  online = c.online;
+  $("onlineBtn").textContent = online ? "Take car offline" : "Bring car online (sync)";
+  const chips = $("chips"); chips.replaceChildren(
+    chip(c.vehicle.name, "off"), chip(car.locked ? "LOCKED" : "UNLOCKED", car.locked ? "bad" : "ok"),
+    chip(car.engine_on ? "ENGINE ON" : "engine off", car.engine_on ? "ok" : "off"),
+    chip(car.trunk_open ? "trunk open" : "trunk closed", car.trunk_open ? "warn" : "off"),
+    chip(car.glovebox_open ? "glovebox open" : "glovebox closed", car.glovebox_open ? "warn" : "off"),
+    chip(online ? "online" : "OFFLINE", online ? "off" : "warn"),
+    chip("revocation list v" + car.revocation_version, "off"));
+  const p = c.profile;
+  scr.className = p ? p.theme : "night";
+  $("greeting").textContent = car.locked ? "Car is locked" : (car.holder ? `Welcome, ${car.holder}` : "Unlocked");
+  $("seat").textContent = p ? p.seat_position + " %" : "-";
+  $("seatbar").style.width = (p ? p.seat_position : 0) + "%";
+  $("cabin").textContent = p ? `${p.cabin_temp_c} °C · ${p.music_preset}` : "-";
+  const pr = c.projection || {};
+  $("nav").textContent = pr.nav && pr.nav.destination ? `${pr.nav.destination}` + (pr.nav.eta_min != null ? ` · ${pr.nav.eta_min} min` : "") : "-";
+  const parts = [];
+  if (pr.media && pr.media.title) parts.push(`♪ ${pr.media.title}` + (pr.media.artist ? ` — ${pr.media.artist}` : ""));
+  if (pr.call && pr.call.name) parts.push(`📞 ${pr.call.name}`);
+  $("media").textContent = parts.length ? parts.join("  ") : "-";
+  const log = $("log"); log.replaceChildren();
+  for (const e of c.events) {
+    const t = new Date(e.ts * 1000).toLocaleTimeString();
+    const who = e.holder || "unknown";
+    log.append(el("div", { class: e.ok ? "y" : "n", text:
+      `${t}  ${e.ok ? "ALLOW" : "DENY "}  ${(e.command || "?").padEnd(13)} ${who.padEnd(7)} ${e.reason || ""}` }));
+  }
+}
+
+let busy = false;
+async function refresh() {
+  if (busy || !vehicleId) return; busy = true;
+  try {
+    const [c, k] = await Promise.all([
+      api("GET", `/api/vehicles/${vehicleId}/cockpit`),
+      api("GET", `/api/vehicles/${vehicleId}/keys`, undefined, ownerToken)]);
+    renderCockpit(c.data); renderKeys(k.data.keys || []);
+  } finally { busy = false; }
+}
+
+$("onlineBtn").addEventListener("click", async () => {
+  const { data } = await api("POST", `/api/vehicles/${vehicleId}/car/connectivity`, { online: !online }, ownerToken);
+  toast(data.online ? "Car is online and synced the latest revocation list." : "Car is offline: it can still verify keys, but gets no new revocations.", true);
+  refresh();
+});
+document.querySelectorAll("[data-attack]").forEach((b) => b.addEventListener("click", () => attack(b.dataset.attack)));
+
+(async function init() {
+  const { status, data } = await api("GET", "/api/demo");
+  if (status !== 200) { toast("Demo mode is off. Start with: python -m keycockpit", false); return; }
+  vehicleId = data.vehicle_id; ownerToken = data.owner_token; phones = data.phones;
+  buildPhones(); refresh(); setInterval(refresh, 1500);
+})();
+</script>
+</body>
+</html>
