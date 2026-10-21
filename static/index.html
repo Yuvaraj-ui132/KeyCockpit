@@ -7,255 +7,980 @@
 <link rel="icon" href="data:,">
 <style>
   :root {
-    --bg: #0e1116; --panel: #171b22; --panel2: #1e232c; --line: #2b323d;
-    --text: #e8ecf1; --muted: #8b95a5; --accent: #4cc9a7; --bad: #ff6b6b; --warn: #f5b942;
-    --screen: #0a0d12; --screen-text: #e8ecf1;
+    color-scheme: light;
+    --bg: #f3f5f8;
+    --surface: #fff;
+    --surface-soft: #f7f8fa;
+    --line: #e3e7ed;
+    --text: #17212f;
+    --muted: #637083;
+    --navy: #172b45;
+    --navy-hover: #244263;
+    --green: #16794b;
+    --green-bg: #e8f5ee;
+    --red: #b33b3b;
+    --red-bg: #fbebeb;
+    --amber: #8b5d08;
+    --amber-bg: #fff4d9;
+    --shadow: 0 8px 24px rgba(23, 43, 69, .06);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  header { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex;
-           align-items: baseline; gap: 14px; flex-wrap: wrap; }
-  header h1 { margin: 0; font-size: 20px; letter-spacing: .3px; }
-  header p { margin: 0; color: var(--muted); font-size: 13px; }
-  main { display: grid; gap: 16px; padding: 16px 24px 32px; max-width: 1200px; margin: 0 auto;
-         grid-template-columns: 1.1fr 1fr; }
-  @media (max-width: 880px) { main { grid-template-columns: 1fr; padding: 16px; } }
-  section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-  section h2 { margin: 0 0 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px;
-               color: var(--muted); font-weight: 600; }
-  .wide { grid-column: 1 / -1; }
-  /* cockpit screen */
-  #screen { background: var(--screen); color: var(--screen-text); border-radius: 14px; padding: 18px;
-            border: 1px solid var(--line); min-height: 250px; transition: background .4s, color .4s; }
-  #screen.day { --screen: #e9eef5; --screen-text: #151a22; }
-  .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-  .chip { padding: 3px 10px; border-radius: 999px; font-size: 12px; border: 1px solid currentColor;
-          opacity: .85; }
-  .chip.ok { color: var(--accent); } .chip.bad { color: var(--bad); } .chip.warn { color: var(--warn); }
-  .chip.off { color: var(--muted); }
-  #greeting { font-size: 22px; font-weight: 600; margin: 2px 0 10px; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .tile { background: rgba(127,127,127,.12); border-radius: 10px; padding: 10px 12px; min-height: 64px; }
-  .tile .k { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: .6; }
-  .tile .v { font-size: 16px; margin-top: 2px; word-break: break-word; }
-  .bar { height: 6px; background: rgba(127,127,127,.25); border-radius: 4px; margin-top: 8px; }
-  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
-  /* controls */
-  .phone { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;
-           background: var(--panel2); }
-  .phone .who { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-  .phone .who b { font-size: 15px; } .role { color: var(--muted); font-size: 12px; }
-  button { font: inherit; font-size: 13px; color: var(--text); background: #262d38; border: 1px solid var(--line);
-           border-radius: 8px; padding: 6px 10px; cursor: pointer; margin: 0 4px 6px 0; }
-  button:hover { border-color: var(--accent); } button:active { transform: translateY(1px); }
-  button.danger:hover { border-color: var(--bad); color: var(--bad); }
-  button.cast { color: var(--accent); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
-  th { color: var(--muted); font-weight: 500; font-size: 12px; }
-  .st-active { color: var(--accent); } .st-revoked { color: var(--bad); } .st-expired { color: var(--warn); }
-  #toast { min-height: 40px; padding: 10px 12px; border-radius: 8px; background: var(--panel2);
-           border-left: 4px solid var(--muted); margin-bottom: 12px; font-size: 14px; }
-  #toast.ok { border-color: var(--accent); } #toast.bad { border-color: var(--bad); }
-  .log { font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; max-height: 260px; overflow: auto; }
-  .log div { padding: 2px 0; border-bottom: 1px dashed var(--line); white-space: pre; }
-  .log .y { color: var(--accent); } .log .n { color: var(--bad); }
-  .hint { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner, main {
+    width: min(1120px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+  .topbar-inner {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--navy);
+    color: white;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .brand h1 { margin: 0; font-size: 19px; letter-spacing: -.3px; }
+  .brand p { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
+  nav { display: flex; align-items: center; gap: 4px; }
+  .nav-button {
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .nav-button:hover, .nav-button[aria-current="page"] {
+    background: #edf1f6;
+    color: var(--navy);
+  }
+  main { padding: 30px 0 56px; }
+  .page[hidden] { display: none; }
+  .page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    margin: 0 0 22px;
+  }
+  .eyebrow {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  h2, h3, p { margin-top: 0; }
+  .page-heading h2 { margin: 3px 0 0; font-size: clamp(24px, 4vw, 31px); letter-spacing: -.7px; }
+  .page-heading p { margin: 6px 0 0; color: var(--muted); }
+  .card {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .card + .card { margin-top: 18px; }
+  .card-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    margin-bottom: 17px;
+  }
+  .card-heading h3 { margin: 0; font-size: 17px; letter-spacing: -.2px; }
+  .card-heading p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 18px; }
+  .vehicle-card {
+    min-height: 310px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    color: #fff;
+    background: linear-gradient(145deg, #1b304b, #263c57);
+  }
+  .vehicle-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+  .vehicle-top h3 { margin: 3px 0 0; font-size: 25px; letter-spacing: -.5px; }
+  .vehicle-top .eyebrow { color: #bdc9d7; }
+  .state-pill, .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+  .state-pill { background: rgba(255,255,255,.12); color: #fff; }
+  .state-pill::before {
+    content: "";
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #95a4b6;
+  }
+  .state-pill.good::before { background: #6cdda0; }
+  .state-pill.warn::before { background: #f2bd54; }
+  .state-pill.secure::before { background: #6cdda0; }
+  .state-pill.open::before { background: #f2bd54; }
+  .summary-item strong.state-good { color: #7ee0a5; }
+  .summary-item strong.state-warn { color: #ffd078; }
+  .summary-item strong.state-neutral { color: #fff; }
+  .vehicle-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0; }
+  .summary-item { padding: 13px; border-radius: 10px; background: rgba(255,255,255,.09); }
+  .summary-item span { display: block; color: #c2ccda; font-size: 12px; }
+  .summary-item strong { display: block; margin-top: 4px; font-size: 16px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 9px; }
+  .button {
+    min-height: 40px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 650;
+    font-size: 13px;
+    transition: background-color .15s ease, border-color .15s ease;
+  }
+  .button:hover { background: var(--navy-hover); }
+  .button:disabled { cursor: wait; opacity: .6; }
+  .button.secondary { border-color: var(--line); background: var(--surface); color: var(--text); }
+  .button.secondary:hover { border-color: #b7c1cd; background: var(--surface-soft); }
+  .button.success { background: var(--green); }
+  .button.success:hover { background: #11663f; }
+  .button.danger { border-color: #f1d0d0; background: var(--red-bg); color: var(--red); }
+  .button.danger:hover { background: #f7dddd; }
+  .button.small { min-height: 34px; padding: 6px 10px; font-size: 12px; }
+  .select-label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+  .select-label select { min-width: 140px; }
+  .key-picker { max-width: 220px; margin-top: 18px; }
+  .quick-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .quick-tile {
+    min-height: 97px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: var(--surface-soft);
+  }
+  .cockpit-preview.night {
+    margin: -8px;
+    padding: 8px;
+    border-radius: 10px;
+    background: #202b3a;
+    color: #f1f4f8;
+  }
+  .cockpit-preview.night .quick-tile { border-color: #3a4656; background: #2b3748; }
+  .cockpit-preview.night .quick-tile span,
+  .cockpit-preview.night .profile-note { color: #c2ccda; }
+  .quick-tile span { color: var(--muted); font-size: 12px; }
+  .quick-tile strong { font-size: 17px; font-weight: 650; overflow-wrap: anywhere; }
+  .profile-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
+  .notice {
+    display: none;
+    margin: 0 0 18px;
+    padding: 11px 14px;
+    border: 1px solid var(--line);
+    border-left: 4px solid #97a3b2;
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+  }
+  .notice.visible { display: block; }
+  .notice.ok { border-left-color: var(--green); background: var(--green-bg); color: #145c3b; }
+  .notice.bad { border-left-color: var(--red); background: var(--red-bg); color: #8e2c2c; }
+  .notice.info { border-left-color: #526d8b; }
+  .inline-status { display: flex; align-items: center; gap: 9px; }
+  .badge.active { background: var(--green-bg); color: var(--green); }
+  .badge.revoked { background: var(--red-bg); color: var(--red); }
+  .badge.expired { background: var(--amber-bg); color: var(--amber); }
+  .badge.neutral { background: #edf1f5; color: #465467; }
+  .connection-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-top: 18px;
+  }
+  .connection-card h3 { margin: 0; font-size: 15px; }
+  .connection-card p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .key-list { display: grid; gap: 10px; }
+  .key-card {
+    display: grid;
+    grid-template-columns: minmax(150px, 1.3fr) minmax(90px, .8fr) minmax(160px, 1fr) auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .key-name { min-width: 0; }
+  .key-name strong { display: block; overflow-wrap: anywhere; }
+  .key-name span, .key-detail span { color: var(--muted); font-size: 12px; }
+  .key-detail strong { display: block; font-size: 13px; font-weight: 550; }
+  .empty-state {
+    padding: 28px 18px;
+    border: 1px dashed #cbd3dd;
+    border-radius: 10px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 13px;
+  }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .field { display: grid; gap: 6px; color: var(--text); font-size: 13px; font-weight: 600; }
+  .field small { color: var(--muted); font-size: 12px; font-weight: 400; }
+  input, select {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid #cbd3dd;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: var(--text);
+  }
+  input:focus, select:focus, button:focus-visible {
+    outline: 3px solid rgba(47, 103, 159, .25);
+    outline-offset: 1px;
+    border-color: #547ba5;
+  }
+  input[type="range"] { min-height: 26px; padding: 0; accent-color: var(--navy); }
+  input[type="range"] + output { color: var(--muted); font-size: 12px; font-weight: 500; }
+  .form-actions { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+  .form-feedback { min-height: 20px; color: var(--muted); font-size: 13px; }
+  .form-feedback.ok { color: var(--green); }
+  .form-feedback.bad { color: var(--red); }
+  .attack-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .attack-card { display: flex; flex-direction: column; align-items: start; gap: 10px; }
+  .attack-card h3 { margin: 0; font-size: 15px; }
+  .attack-card p { margin: 0; color: var(--muted); font-size: 13px; }
+  .attack-result {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--surface-soft);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .attack-result.blocked { background: var(--green-bg); color: var(--green); }
+  .attack-result.failed { background: var(--red-bg); color: var(--red); }
+  .audit-list { display: grid; gap: 8px; }
+  .audit-row {
+    display: grid;
+    grid-template-columns: auto minmax(80px, .6fr) minmax(120px, 1fr) minmax(80px, .7fr) minmax(100px, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+  }
+  .audit-row:last-child { border-bottom: 0; }
+  .audit-row time, .audit-row .muted { color: var(--muted); }
+  .audit-outcome { font-weight: 700; }
+  .audit-outcome.allowed { color: var(--green); }
+  .audit-outcome.denied { color: var(--red); }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .supporting-copy { max-width: 720px; color: var(--muted); font-size: 13px; }
+  .security-note { margin: 18px 0 0; padding: 13px 15px; border-radius: 9px; background: #f1f4f8; color: #4f5e70; font-size: 12px; }
+  @media (max-width: 760px) {
+    .topbar-inner, main { width: min(100% - 28px, 600px); }
+    .topbar-inner { min-height: auto; padding: 14px 0 0; align-items: start; flex-direction: column; gap: 10px; }
+    nav { width: 100%; overflow-x: auto; padding-bottom: 8px; }
+    .nav-button { flex: 0 0 auto; padding: 8px 10px; }
+    main { padding-top: 23px; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .key-card { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+    .key-card .key-detail { grid-column: 1; }
+    .key-card .badge { grid-column: 2; grid-row: 1; }
+    .key-card .key-action { grid-column: 2; grid-row: 2 / span 2; }
+  }
+  @media (max-width: 480px) {
+    .brand p { max-width: 245px; }
+    .page-heading { align-items: start; flex-direction: column; }
+    .card { padding: 17px; }
+    .vehicle-card { min-height: 330px; }
+    .vehicle-summary { gap: 7px; }
+    .summary-item { padding: 10px 8px; }
+    .summary-item strong { font-size: 14px; }
+    .form-grid, .attack-grid { grid-template-columns: 1fr; }
+    .connection-card { align-items: start; flex-direction: column; }
+    .audit-row { grid-template-columns: auto 1fr 1fr; gap: 5px 10px; }
+    .audit-row time { grid-column: 1 / -1; }
+    .audit-row .audit-holder { grid-column: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>KeyCockpit</h1>
-  <p>Phone-as-a-key + digital cockpit simulator. Real signatures, simulated radio and car.</p>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">K</div>
+      <div><h1>KeyCockpit</h1><p>Your digital key dashboard</p></div>
+    </div>
+    <nav aria-label="Main navigation">
+      <button class="nav-button" type="button" data-page="dashboard" aria-current="page">Dashboard</button>
+      <button class="nav-button" type="button" data-page="keys">Digital keys</button>
+      <button class="nav-button" type="button" data-page="profiles">Driver profiles</button>
+      <button class="nav-button" type="button" data-page="security">Security lab</button>
+    </nav>
+  </div>
 </header>
 
 <main>
-  <section>
-    <h2>Digital cockpit</h2>
-    <div id="screen" class="night">
-      <div class="status-row" id="chips"></div>
-      <div id="greeting">Car is locked</div>
-      <div class="grid2">
-        <div class="tile"><div class="k">Seat position</div><div class="v" id="seat">-</div>
-          <div class="bar"><i id="seatbar" style="width:0%"></i></div></div>
-        <div class="tile"><div class="k">Cabin / music</div><div class="v" id="cabin">-</div></div>
-        <div class="tile"><div class="k">Navigation (from phone)</div><div class="v" id="nav">-</div></div>
-        <div class="tile"><div class="k">Media / call (from phone)</div><div class="v" id="media">-</div></div>
-      </div>
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <section class="page" id="page-dashboard" aria-labelledby="dashboard-title">
+    <div class="page-heading">
+      <div><div class="eyebrow">Your vehicle</div><h2 id="dashboard-title">Dashboard</h2>
+        <p>See your car at a glance and control it with a digital key.</p></div>
     </div>
-    <p class="hint">The cockpit loads the profile of whoever's key unlocked the car. Phone content
-      appears only while that phone's engine session is active.</p>
+    <div class="dashboard-grid">
+      <section class="card vehicle-card" aria-labelledby="vehicle-name">
+        <div class="vehicle-top">
+          <div><div class="eyebrow">Vehicle status</div><h3 id="vehicle-name">Loading vehicle…</h3></div>
+          <span class="state-pill" id="lock-state">Checking</span>
+        </div>
+        <div class="vehicle-summary">
+          <div class="summary-item"><span>Engine</span><strong id="engine-state">Checking</strong></div>
+          <div class="summary-item"><span>Connection</span><strong id="connection-state">Checking</strong></div>
+          <div class="summary-item"><span>Driver</span><strong id="driver-state">—</strong></div>
+        </div>
+        <div>
+          <div class="controls" aria-label="Vehicle controls">
+            <button class="button success" type="button" data-command="unlock">Unlock</button>
+            <button class="button secondary" type="button" data-command="lock">Lock</button>
+            <button class="button" type="button" data-command="start">Start</button>
+            <button class="button secondary" type="button" data-command="stop">Stop</button>
+          </div>
+          <label class="select-label key-picker" for="active-phone">Use key</label>
+          <select id="active-phone" class="key-picker" aria-label="Choose which digital key to use"></select>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="cockpit-title">
+        <div class="card-heading"><div><h3 id="cockpit-title">Inside the car</h3>
+          <p>Driver settings and phone information appear when available.</p></div></div>
+        <div class="cockpit-preview day" id="cockpit-preview"><div class="quick-grid">
+          <div class="quick-tile"><span>Seat position</span><strong id="seat">—</strong></div>
+          <div class="quick-tile"><span>Cabin temperature</span><strong id="cabin">—</strong></div>
+          <div class="quick-tile"><span>Navigation</span><strong id="nav">—</strong></div>
+          <div class="quick-tile"><span>Music / call</span><strong id="media">—</strong></div>
+        </div><p class="profile-note" id="cockpit-note">Unlock the car to see the driver's profile.</p></div>
+        <div class="controls" style="margin-top:16px">
+          <button class="button secondary" type="button" id="castBtn">Send phone info</button>
+          <details>
+            <summary class="button secondary">More controls</summary>
+            <div class="controls" style="margin-top:10px">
+              <button class="button secondary" type="button" data-command="open_trunk">Open trunk</button>
+              <button class="button secondary" type="button" data-command="open_glovebox">Open glovebox</button>
+            </div>
+          </details>
+        </div>
+      </section>
+    </div>
+
+    <section class="card connection-card" aria-labelledby="connection-title">
+      <div><h3 id="connection-title">Car connection</h3>
+        <p id="connection-help">When offline, the car cannot receive new key revocations until it reconnects.</p></div>
+      <button class="button secondary" id="onlineBtn" type="button">Checking…</button>
+    </section>
+    <section class="card" aria-labelledby="audit-title">
+      <div class="card-heading"><div><h3 id="audit-title">Recent activity</h3>
+        <p>Actions accepted or declined by the car.</p></div></div>
+      <div class="audit-list" id="log"><div class="empty-state">Activity will appear here.</div></div>
+    </section>
   </section>
 
-  <section>
-    <h2>Phones</h2>
-    <div id="toast">Press a button on a phone to start.</div>
-    <div id="phones"></div>
+  <section class="page" id="page-keys" aria-labelledby="keys-title" hidden>
+    <div class="page-heading">
+      <div><div class="eyebrow">Access management</div><h2 id="keys-title">Digital keys</h2>
+        <p>Manage who can use this vehicle and how long their key remains valid.</p></div>
+    </div>
+    <section class="card" aria-labelledby="issued-keys-title">
+      <div class="card-heading"><div><h3 id="issued-keys-title">Issued keys</h3>
+        <p>Expired and revoked keys remain listed for clarity.</p></div></div>
+      <div class="key-list" id="keys"><div class="empty-state">Loading keys…</div></div>
+    </section>
+    <section class="card" aria-labelledby="issue-title">
+      <div class="card-heading"><div><h3 id="issue-title">Issue a digital key</h3>
+        <p>Add a signed key for a phone. Demo phones are already set up and ready to use.</p></div></div>
+      <form id="issue-form">
+        <div class="form-grid">
+          <label class="field">Holder name
+            <input name="holder" maxlength="40" autocomplete="off" placeholder="e.g. Jordan" required>
+          </label>
+          <label class="field">Role
+            <select name="role" required>
+              <option value="guest">Guest</option><option value="owner">Owner</option><option value="valet">Valet</option>
+            </select>
+            <small>Owner: full access, up to 30 days. Guest: standard access, up to 7 days. Valet: limited access, up to 12 hours.</small>
+          </label>
+          <label class="field">Key lifetime (minutes)
+            <input name="valid_minutes" type="number" min="1" step="1" value="60" required>
+            <small>Enter the duration in minutes; the maximum depends on the role.</small>
+          </label>
+          <label class="field">Phone public key
+            <input name="phone_public_key" autocomplete="off" placeholder="Paste the phone's public key" required>
+            <small>Only a phone with the matching private key can use this certificate.</small>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="button" type="submit">Issue key</button>
+          <span class="form-feedback" id="issue-feedback" aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
   </section>
 
-  <section>
-    <h2>Owner: keys and car connectivity</h2>
-    <table><thead><tr><th>Holder</th><th>Role</th><th>Status</th><th></th></tr></thead>
-      <tbody id="keys"></tbody></table>
-    <p style="margin-top:12px">
-      <button id="onlineBtn"></button>
-    </p>
-    <p class="hint">Revoke while the car is online: blocked at once. Take the car offline first and
-      it keeps trusting the key until it syncs (or the key expires). That is why keys are short-lived.</p>
+  <section class="page" id="page-profiles" aria-labelledby="profiles-title" hidden>
+    <div class="page-heading">
+      <div><div class="eyebrow">Personal settings</div><h2 id="profiles-title">Driver profiles</h2>
+        <p>Set the comfort preferences the car loads for each driver.</p></div>
+    </div>
+    <section class="card" aria-labelledby="profile-form-title">
+      <div class="card-heading"><div><h3 id="profile-form-title">Comfort settings</h3>
+        <p>Choose a driver, adjust their preferences, and save.</p></div></div>
+      <form id="profile-form">
+        <div class="form-grid">
+          <label class="field">Driver
+            <select name="holder" id="profile-holder" required></select>
+            <small>The active driver's saved settings load when they unlock. For another driver, set the values you want to save.</small>
+          </label>
+          <label class="field">Seat position
+            <input name="seat_position" type="range" min="0" max="100" value="50">
+            <output id="seat-output">50%</output>
+          </label>
+          <label class="field">Cabin temperature
+            <input name="cabin_temp_c" type="number" min="16" max="30" value="22" required>
+            <small>Choose a temperature from 16°C to 30°C.</small>
+          </label>
+          <label class="field">Music preset
+            <input name="music_preset" maxlength="40" value="Radio" required>
+          </label>
+          <label class="field">Cockpit theme
+            <select name="theme"><option value="day">Light</option><option value="night">Dark</option></select>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="button" type="submit">Save profile</button>
+          <span class="form-feedback" id="profile-feedback" aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
   </section>
 
-  <section>
-    <h2>Attack lab</h2>
-    <button data-attack="replay">Replay captured unlock</button>
-    <button data-attack="relay">Relay attack</button>
-    <button data-attack="forged_cert">Forged certificate</button>
-    <button data-attack="stolen_cert">Stolen certificate</button>
-    <p class="hint">Each button is a real attempt against the car's real checks. "Replay" needs one
-      successful press first (it re-sends that message).</p>
-  </section>
-
-  <section class="wide">
-    <h2>Audit log (what the car decided)</h2>
-    <div class="log" id="log"></div>
+  <section class="page" id="page-security" aria-labelledby="security-title" hidden>
+    <div class="page-heading">
+      <div><div class="eyebrow">Learn how digital keys are protected</div><h2 id="security-title">Security lab</h2>
+        <p>Try a simulated attack. Each attempt goes through the car's real security checks.</p></div>
+    </div>
+    <div class="attack-grid">
+      <article class="card attack-card">
+        <h3>Replay a captured action</h3>
+        <p>Attempts to reuse a previously accepted unlock message. The car should reject it because its one-time challenge was already used.</p>
+        <button class="button secondary" type="button" data-attack="replay">Try replay</button>
+        <div class="attack-result" id="result-replay" aria-live="polite">Unlock the car once before trying this demonstration.</div>
+      </article>
+      <article class="card attack-card">
+        <h3>Relay a distant phone</h3>
+        <p>Forwards the car's challenge to a real phone but delays the reply. The car should reject the answer for arriving too late.</p>
+        <button class="button secondary" type="button" data-attack="relay">Try relay</button>
+        <div class="attack-result" id="result-relay" aria-live="polite">Ready to try.</div>
+      </article>
+      <article class="card attack-card">
+        <h3>Use a forged key</h3>
+        <p>Presents a certificate signed by an unknown authority. The car should reject a key issuer it does not trust.</p>
+        <button class="button secondary" type="button" data-attack="forged_cert">Try forged key</button>
+        <div class="attack-result" id="result-forged_cert" aria-live="polite">Ready to try.</div>
+      </article>
+      <article class="card attack-card">
+        <h3>Use a copied key</h3>
+        <p>Copies a driver's public certificate but does not have their private key. The car should reject the missing valid signature.</p>
+        <button class="button secondary" type="button" data-attack="stolen_cert">Try copied key</button>
+        <div class="attack-result" id="result-stolen_cert" aria-live="polite">Ready to try.</div>
+      </article>
+    </div>
+    <p class="security-note">This is a learning demonstration. The radio link and vehicle are simulated; do not use this project to control a real vehicle.</p>
   </section>
 </main>
 
 <script>
-let vehicleId = null, ownerToken = null, phones = [], online = true;
+let vehicleId = null;
+let ownerToken = null;
+let phones = [];
+let keys = [];
+let online = true;
+let activePhone = "";
+let busy = false;
+let currentDriver = null;
+let currentProfile = null;
+let profileDirty = false;
 const $ = (id) => document.getElementById(id);
+const DEFAULT_PROFILE = { seat_position: 50, cabin_temp_c: 22, music_preset: "Radio", theme: "day" };
+const CAST = {
+  Alice: { nav: { destination: "Kamal Basti, Belagavi", eta_min: 14 }, media: { title: "Evening Drive", artist: "Indie Playlist" }, call: { name: "Mom" } },
+  Bob: { nav: { destination: "Belagavi Fort", eta_min: 9 }, media: { title: "Road Trip Mix", artist: "Bollywood Hits" }, call: { name: "" } },
+  Valet: { nav: { destination: "Parking bay 3", eta_min: 2 }, media: { title: "", artist: "" }, call: { name: "" } }
+};
 
 async function api(method, path, body, token) {
   const headers = {};
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (token) headers["Authorization"] = "Bearer " + token;
-  const res = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
-  let data = {};
-  try { data = await res.json(); } catch (e) {}
-  return { status: res.status, data };
+  let response;
+  try {
+    response = await fetch(path, {
+      method, headers, body: body === undefined ? undefined : JSON.stringify(body)
+    });
+  } catch (error) {
+    throw new Error("Could not reach the server. Check your connection and try again.");
+  }
+  let data;
+  try {
+    data = await response.json();
+  } catch (error) {
+    throw new Error(`The server returned an unreadable response (${response.status}).`);
+  }
+  return { status: response.status, data };
 }
 
 function el(tag, props = {}, ...kids) {
   const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(props)) {
-    if (k === "class") node.className = v; else if (k === "text") node.textContent = v;
-    else if (k.startsWith("on")) node.addEventListener(k.slice(2), v); else node.setAttribute(k, v);
+  for (const [key, value] of Object.entries(props)) {
+    if (key === "class") node.className = value;
+    else if (key === "text") node.textContent = value;
+    else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value);
   }
   kids.forEach((kid) => node.append(kid));
   return node;
 }
 
-function toast(text, ok) { const t = $("toast"); t.textContent = text; t.className = ok ? "ok" : "bad"; }
-
-const COMMANDS = [["unlock","Unlock"],["lock","Lock"],["open_trunk","Trunk"],["open_glovebox","Glovebox"],["start","Start"],["stop","Stop"]];
-const CAST = {
-  Alice: { nav: { destination: "Kamal Basti, Belagavi", eta_min: 14 }, media: { title: "Evening Drive", artist: "Indie Playlist" }, call: { name: "Mom" } },
-  Bob:   { nav: { destination: "Belagavi Fort", eta_min: 9 }, media: { title: "Road Trip Mix", artist: "Bollywood Hits" }, call: { name: "" } },
-  Valet: { nav: { destination: "Parking bay 3", eta_min: 2 }, media: { title: "", artist: "" }, call: { name: "" } },
-};
-
-async function press(name, command) {
-  const { data } = await api("POST", `/api/demo/phones/${name}/press`, { command });
-  toast(`${name} → ${command}: ` + (data.ok ? "OK" : "DENIED (" + data.reason + ")"), data.ok);
-  refresh();
+function showNotice(message, kind = "info") {
+  const notice = $("notice");
+  notice.textContent = message;
+  notice.className = "notice visible " + kind;
 }
 
-async function cast(name) {
-  const { status, data } = await api("POST", `/api/demo/phones/${name}/project`, CAST[name]);
-  toast(status === 200 ? `${name}'s phone is now projecting to the cockpit` : (data.error || "failed"), status === 200);
-  refresh();
+function setFeedback(id, message, kind = "") {
+  const feedback = $(id);
+  feedback.textContent = message;
+  feedback.className = "form-feedback" + (kind ? " " + kind : "");
 }
 
-async function attack(kind) {
-  const { status, data } = await api("POST", `/api/demo/attacks/${kind}`);
-  if (status !== 200) { toast(data.error || "attack failed to run", false); return; }
-  toast(`Attacker ${data.what}: ` + (data.blocked ? "BLOCKED (" + data.reason + ")" : "SUCCEEDED"), data.blocked);
-  refresh();
+function explainError(error, data) {
+  return data && data.error ? data.error : (error && error.message) || "Something went wrong. Please try again.";
 }
 
-function buildPhones() {
-  const box = $("phones"); box.replaceChildren();
-  for (const p of phones) {
-    const row = el("div", { class: "phone" },
-      el("div", { class: "who" }, el("b", { text: p.name + "'s phone" }), el("span", { class: "role", text: p.role })));
-    for (const [cmd, label] of COMMANDS) row.append(el("button", { text: label, onclick: () => press(p.name, cmd) }));
-    row.append(el("button", { class: "cast", text: "Cast to car", onclick: () => cast(p.name) }));
-    box.append(row);
+function navigate(page) {
+  document.querySelectorAll(".page").forEach((section) => {
+    section.hidden = section.id !== "page-" + page;
+  });
+  document.querySelectorAll(".nav-button").forEach((button) => {
+    if (button.dataset.page === page) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function expiryDate(timestamp) {
+  return new Date(timestamp * 1000).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+}
+
+function renderKeys() {
+  const list = $("keys");
+  list.replaceChildren();
+  if (!keys.length) {
+    list.append(el("div", { class: "empty-state", text: "No digital keys yet. Issue a key below to give a driver access." }));
+    return;
+  }
+  for (const key of keys) {
+    const status = ["active", "revoked", "expired"].includes(key.status) ? key.status : "neutral";
+    const action = key.status === "active"
+      ? el("button", { class: "button danger small key-action", type: "button", text: "Revoke",
+          "aria-label": `Revoke ${key.holder}'s key`, onclick: () => revokeKey(key) })
+      : el("span", { class: "key-action" });
+    list.append(el("article", { class: "key-card" },
+      el("div", { class: "key-name" }, el("strong", { text: key.holder })),
+      el("div", { class: "key-detail" }, el("span", { text: "Role" }),
+        el("strong", { text: key.role.charAt(0).toUpperCase() + key.role.slice(1) })),
+      el("div", { class: "key-detail" }, el("span", { text: "Expires" }),
+        el("strong", { text: expiryDate(key.expires_at) })),
+      el("span", { class: "badge " + status, text: status.charAt(0).toUpperCase() + status.slice(1) }),
+      action
+    ));
   }
 }
 
-function renderKeys(keys) {
-  const body = $("keys"); body.replaceChildren();
-  for (const k of keys) {
-    const act = k.status === "active"
-      ? el("button", { class: "danger", text: "Revoke", onclick: async () => {
-          const { data } = await api("DELETE", `/api/vehicles/${vehicleId}/keys/${k.key_id}`, undefined, ownerToken);
-          toast(data.car_updated ? `Revoked ${k.holder}'s key; the car has the new list.` : `Revoked ${k.holder}'s key, but the car is OFFLINE and still trusts it.`, data.car_updated);
-          refresh();
-        } })
-      : el("span");
-    body.append(el("tr", {}, el("td", { text: k.holder }), el("td", { text: k.role }),
-      el("td", { class: "st-" + k.status, text: k.status }), el("td", {}, act)));
+function renderHolderOptions() {
+  const holderSelect = $("profile-holder");
+  const previous = holderSelect.value;
+  holderSelect.replaceChildren();
+  const holders = [...new Set(keys.map((key) => key.holder))];
+  if (!holders.length) holders.push("Driver");
+  holders.forEach((holder) => holderSelect.append(el("option", { value: holder, text: holder })));
+  holderSelect.value = holders.includes(previous) ? previous : (holders.includes(activePhone) ? activePhone : holders[0]);
+}
+
+function renderCockpit(state) {
+  const car = state.car;
+  online = state.online;
+  currentDriver = car.holder;
+  currentProfile = state.profile;
+  $("vehicle-name").textContent = state.vehicle.name;
+  const lockPill = $("lock-state");
+  lockPill.textContent = car.locked ? "Locked" : "Unlocked";
+  lockPill.className = "state-pill " + (car.locked ? "secure" : "open");
+  $("engine-state").textContent = car.engine_on ? "Running" : "Off";
+  $("engine-state").className = car.engine_on ? "state-good" : "state-neutral";
+  $("connection-state").textContent = online ? "Connected" : "Offline";
+  $("connection-state").className = online ? "state-good" : "state-warn";
+  $("driver-state").textContent = car.holder || "No driver";
+  $("onlineBtn").textContent = online ? "Take car offline" : "Reconnect and sync";
+  $("connection-help").textContent = online
+    ? "Taking the car offline means it will not receive new key revocations until it reconnects."
+    : "Reconnect the car to sync the latest key revocations.";
+  const profile = state.profile;
+  $("cockpit-preview").className = "cockpit-preview " + (profile ? profile.theme : "day");
+  $("seat").textContent = profile ? `${profile.seat_position}%` : "—";
+  $("cabin").textContent = profile ? `${profile.cabin_temp_c}°C · ${profile.music_preset}` : "—";
+  $("cockpit-note").textContent = profile
+    ? `Comfort settings for ${car.holder || "the current driver"}.`
+    : "Unlock the car to see the driver's profile and settings.";
+  if (!profileDirty && $("profile-holder").value === currentDriver && profile) {
+    populateProfileForm(profile);
+  }
+  const projection = state.projection || {};
+  $("nav").textContent = projection.nav && projection.nav.destination
+    ? projection.nav.destination + (projection.nav.eta_min != null ? ` · ${projection.nav.eta_min} min` : "")
+    : "No active route";
+  const media = [];
+  if (projection.media && projection.media.title) {
+    media.push(projection.media.title + (projection.media.artist ? ` · ${projection.media.artist}` : ""));
+  }
+  if (projection.call && projection.call.name) media.push(`Call: ${projection.call.name}`);
+  $("media").textContent = media.length ? media.join(" · ") : "Nothing playing";
+  renderAudit(state.events || []);
+}
+
+function renderAudit(events) {
+  const log = $("log");
+  log.replaceChildren();
+  if (!events.length) {
+    log.append(el("div", { class: "empty-state", text: "No activity yet. Try one of the vehicle controls." }));
+    return;
+  }
+  for (const event of events) {
+    const time = new Date(event.ts * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    log.append(el("div", { class: "audit-row" },
+      el("time", { text: time }),
+      el("span", { class: "audit-outcome " + (event.ok ? "allowed" : "denied"),
+        text: event.ok ? "Allowed" : "Declined" }),
+      el("strong", { text: (event.command || "Action").replaceAll("_", " ") }),
+      el("span", { class: "audit-holder", text: event.holder || "Unknown driver" }),
+      el("span", { class: "muted", text: event.ok ? "Completed" : (event.reason || "Not allowed").replaceAll("_", " ") })
+    ));
   }
 }
 
-function chip(text, cls) { return el("span", { class: "chip " + cls, text }); }
-
-function renderCockpit(c) {
-  const car = c.car, scr = $("screen");
-  online = c.online;
-  $("onlineBtn").textContent = online ? "Take car offline" : "Bring car online (sync)";
-  const chips = $("chips"); chips.replaceChildren(
-    chip(c.vehicle.name, "off"), chip(car.locked ? "LOCKED" : "UNLOCKED", car.locked ? "bad" : "ok"),
-    chip(car.engine_on ? "ENGINE ON" : "engine off", car.engine_on ? "ok" : "off"),
-    chip(car.trunk_open ? "trunk open" : "trunk closed", car.trunk_open ? "warn" : "off"),
-    chip(car.glovebox_open ? "glovebox open" : "glovebox closed", car.glovebox_open ? "warn" : "off"),
-    chip(online ? "online" : "OFFLINE", online ? "off" : "warn"),
-    chip("revocation list v" + car.revocation_version, "off"));
-  const p = c.profile;
-  scr.className = p ? p.theme : "night";
-  $("greeting").textContent = car.locked ? "Car is locked" : (car.holder ? `Welcome, ${car.holder}` : "Unlocked");
-  $("seat").textContent = p ? p.seat_position + " %" : "-";
-  $("seatbar").style.width = (p ? p.seat_position : 0) + "%";
-  $("cabin").textContent = p ? `${p.cabin_temp_c} °C · ${p.music_preset}` : "-";
-  const pr = c.projection || {};
-  $("nav").textContent = pr.nav && pr.nav.destination ? `${pr.nav.destination}` + (pr.nav.eta_min != null ? ` · ${pr.nav.eta_min} min` : "") : "-";
-  const parts = [];
-  if (pr.media && pr.media.title) parts.push(`♪ ${pr.media.title}` + (pr.media.artist ? ` — ${pr.media.artist}` : ""));
-  if (pr.call && pr.call.name) parts.push(`📞 ${pr.call.name}`);
-  $("media").textContent = parts.length ? parts.join("  ") : "-";
-  const log = $("log"); log.replaceChildren();
-  for (const e of c.events) {
-    const t = new Date(e.ts * 1000).toLocaleTimeString();
-    const who = e.holder || "unknown";
-    log.append(el("div", { class: e.ok ? "y" : "n", text:
-      `${t}  ${e.ok ? "ALLOW" : "DENY "}  ${(e.command || "?").padEnd(13)} ${who.padEnd(7)} ${e.reason || ""}` }));
+function setBusy(button, busy, waitingLabel) {
+  if (busy) {
+    button.dataset.originalText = button.textContent;
+    button.textContent = waitingLabel || "Please wait…";
+    button.disabled = true;
+  } else {
+    button.textContent = button.dataset.originalText || button.textContent;
+    button.disabled = false;
   }
 }
 
-let busy = false;
 async function refresh() {
-  if (busy || !vehicleId) return; busy = true;
+  if (busy || !vehicleId) return;
+  busy = true;
   try {
-    const [c, k] = await Promise.all([
+    const [cockpit, keyResponse] = await Promise.all([
       api("GET", `/api/vehicles/${vehicleId}/cockpit`),
-      api("GET", `/api/vehicles/${vehicleId}/keys`, undefined, ownerToken)]);
-    renderCockpit(c.data); renderKeys(k.data.keys || []);
-  } finally { busy = false; }
+      api("GET", `/api/vehicles/${vehicleId}/keys`, undefined, ownerToken)
+    ]);
+    if (cockpit.status !== 200) throw new Error(explainError(null, cockpit.data));
+    if (keyResponse.status !== 200) throw new Error(explainError(null, keyResponse.data));
+    keys = keyResponse.data.keys;
+    if (!Array.isArray(keys)) throw new Error("The server returned an invalid key list.");
+    renderCockpit(cockpit.data);
+    renderKeys();
+    renderHolderOptions();
+  } catch (error) {
+    showNotice(error.message || "Could not refresh vehicle information.", "bad");
+  } finally {
+    busy = false;
+  }
 }
 
-$("onlineBtn").addEventListener("click", async () => {
-  const { data } = await api("POST", `/api/vehicles/${vehicleId}/car/connectivity`, { online: !online }, ownerToken);
-  toast(data.online ? "Car is online and synced the latest revocation list." : "Car is offline: it can still verify keys, but gets no new revocations.", true);
-  refresh();
+async function press(command) {
+  if (!activePhone) {
+    showNotice("Choose a digital key before using the vehicle controls.", "bad");
+    return;
+  }
+  const button = document.querySelector(`[data-command="${command}"]`);
+  setBusy(button, true, "Working…");
+  try {
+    const { status, data } = await api("POST", `/api/demo/phones/${encodeURIComponent(activePhone)}/press`, { command });
+    if (status !== 200 || !data.ok) {
+      showNotice(`${data.reason ? data.reason.replaceAll("_", " ") : "The car declined this action."}`, "bad");
+    } else {
+      showNotice(`${activePhone} used their key to ${command.replaceAll("_", " ")} the car.`, "ok");
+    }
+    await refresh();
+  } catch (error) {
+    showNotice(error.message, "bad");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function revokeKey(key) {
+  if (!window.confirm(`Revoke ${key.holder}'s digital key?`)) return;
+  try {
+    const { status, data } = await api("DELETE", `/api/vehicles/${vehicleId}/keys/${encodeURIComponent(key.key_id)}`, undefined, ownerToken);
+    if (status !== 200) throw new Error(explainError(null, data));
+    showNotice(data.car_updated
+      ? `${key.holder}'s key was revoked and the car has the updated list.`
+      : `${key.holder}'s key was revoked. The car is offline and will trust it until it syncs or the key expires.`, data.car_updated ? "ok" : "info");
+    await refresh();
+  } catch (error) {
+    showNotice(error.message, "bad");
+  }
+}
+
+async function toggleConnection(button) {
+  setBusy(button, true, "Updating…");
+  try {
+    const { status, data } = await api("POST", `/api/vehicles/${vehicleId}/car/connectivity`,
+      { online: !online }, ownerToken);
+    if (status !== 200) throw new Error(explainError(null, data));
+    showNotice(data.online
+      ? "The car is connected and has synced the latest key revocations."
+      : "The car is offline. It cannot receive new revocations until it reconnects.", "ok");
+    await refresh();
+  } catch (error) {
+    showNotice(error.message, "bad");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function issueKey(form) {
+  const values = new FormData(form);
+  const feedback = $("issue-feedback");
+  const button = form.querySelector('button[type="submit"]');
+  setFeedback("issue-feedback", "");
+  setBusy(button, true, "Issuing…");
+  try {
+    const body = {
+      holder: values.get("holder").trim(),
+      role: values.get("role"),
+      valid_minutes: Number(values.get("valid_minutes")),
+      phone_public_key: values.get("phone_public_key").trim()
+    };
+    const { status, data } = await api("POST", `/api/vehicles/${vehicleId}/keys`, body, ownerToken);
+    if (status !== 201) throw new Error(explainError(null, data));
+    form.reset();
+    setFeedback("issue-feedback", `Key issued for ${body.holder}.`, "ok");
+    await refresh();
+  } catch (error) {
+    feedback.className = "form-feedback bad";
+    feedback.textContent = error.message;
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+function loadProfileDefaults() {
+  profileDirty = false;
+  if ($("profile-holder").value === currentDriver && currentProfile) {
+    populateProfileForm(currentProfile);
+    return;
+  }
+  const form = $("profile-form");
+  const current = form.elements;
+  current.seat_position.value = DEFAULT_PROFILE.seat_position;
+  $("seat-output").textContent = `${DEFAULT_PROFILE.seat_position}%`;
+  current.cabin_temp_c.value = DEFAULT_PROFILE.cabin_temp_c;
+  current.music_preset.value = DEFAULT_PROFILE.music_preset;
+  current.theme.value = DEFAULT_PROFILE.theme;
+}
+
+function populateProfileForm(profile) {
+  const form = $("profile-form");
+  form.elements.seat_position.value = profile.seat_position;
+  $("seat-output").textContent = `${profile.seat_position}%`;
+  form.elements.cabin_temp_c.value = profile.cabin_temp_c;
+  form.elements.music_preset.value = profile.music_preset;
+  form.elements.theme.value = profile.theme;
+}
+
+async function saveProfile(form) {
+  const values = new FormData(form);
+  const feedback = $("profile-feedback");
+  const button = form.querySelector('button[type="submit"]');
+  setFeedback("profile-feedback", "");
+  setBusy(button, true, "Saving…");
+  try {
+    const holder = values.get("holder");
+    const profile = {
+      seat_position: Number(values.get("seat_position")),
+      cabin_temp_c: Number(values.get("cabin_temp_c")),
+      music_preset: values.get("music_preset").trim(),
+      theme: values.get("theme")
+    };
+    const { status, data } = await api("PUT",
+      `/api/vehicles/${vehicleId}/profiles/${encodeURIComponent(holder)}`, profile, ownerToken);
+    if (status !== 200) throw new Error(explainError(null, data));
+    profileDirty = false;
+    currentProfile = profile;
+    currentDriver = holder;
+    $("cockpit-preview").className = "cockpit-preview " + profile.theme;
+    setFeedback("profile-feedback", `Settings saved for ${holder}.`, "ok");
+    await refresh();
+  } catch (error) {
+    feedback.className = "form-feedback bad";
+    feedback.textContent = error.message;
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function runAttack(kind, button) {
+  const result = $("result-" + kind);
+  setBusy(button, true, "Checking…");
+  try {
+    const { status, data } = await api("POST", `/api/demo/attacks/${kind}`);
+    if (status !== 200) {
+      result.className = "attack-result failed";
+      result.textContent = explainError(null, data);
+      showNotice(result.textContent, "bad");
+      return;
+    }
+    result.className = "attack-result " + (data.blocked ? "blocked" : "failed");
+    result.textContent = data.blocked
+      ? `Blocked — ${data.what}. The car rejected it (${(data.reason || "security check").replaceAll("_", " ")}).`
+      : `Not blocked — ${data.what}. Review the car's security checks.`;
+    showNotice(data.blocked ? "Attack blocked. The car's security check worked." : "The simulated attack was not blocked.", data.blocked ? "ok" : "bad");
+    await refresh();
+  } catch (error) {
+    result.className = "attack-result failed";
+    result.textContent = error.message;
+    showNotice(error.message, "bad");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function castPhone() {
+  if (!activePhone || !CAST[activePhone.charAt(0).toUpperCase() + activePhone.slice(1)]) {
+    showNotice("Phone information is only available for the built-in demo keys.", "info");
+    return;
+  }
+  const button = $("castBtn");
+  setBusy(button, true, "Sending…");
+  try {
+    const name = activePhone.charAt(0).toUpperCase() + activePhone.slice(1);
+    const { status, data } = await api("POST",
+      `/api/demo/phones/${encodeURIComponent(activePhone)}/project`, CAST[name]);
+    if (status !== 200) throw new Error(explainError(null, data));
+    showNotice(`${name}'s navigation and media are now shown in the cockpit.`, "ok");
+    await refresh();
+  } catch (error) {
+    showNotice(error.message, "bad");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+document.querySelectorAll(".nav-button").forEach((button) => {
+  button.addEventListener("click", () => navigate(button.dataset.page));
 });
-document.querySelectorAll("[data-attack]").forEach((b) => b.addEventListener("click", () => attack(b.dataset.attack)));
+document.querySelectorAll("[data-command]").forEach((button) => {
+  button.addEventListener("click", () => press(button.dataset.command));
+});
+document.querySelectorAll("[data-attack]").forEach((button) => {
+  button.addEventListener("click", () => runAttack(button.dataset.attack, button));
+});
+$("onlineBtn").addEventListener("click", (event) => toggleConnection(event.currentTarget));
+$("castBtn").addEventListener("click", castPhone);
+$("active-phone").addEventListener("change", (event) => { activePhone = event.target.value; });
+$("profile-holder").addEventListener("change", loadProfileDefaults);
+$("profile-form").addEventListener("input", (event) => {
+  if (event.target.name !== "holder") profileDirty = true;
+  if (event.target.name === "seat_position") $("seat-output").textContent = `${event.target.value}%`;
+});
+$("issue-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  issueKey(event.currentTarget);
+});
+$("profile-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveProfile(event.currentTarget);
+});
 
 (async function init() {
-  const { status, data } = await api("GET", "/api/demo");
-  if (status !== 200) { toast("Demo mode is off. Start with: python -m keycockpit", false); return; }
-  vehicleId = data.vehicle_id; ownerToken = data.owner_token; phones = data.phones;
-  buildPhones(); refresh(); setInterval(refresh, 1500);
+  try {
+    const { status, data } = await api("GET", "/api/demo");
+    if (status !== 200) throw new Error(data.error || "Demo mode is not available.");
+    vehicleId = data.vehicle_id;
+    ownerToken = data.owner_token;
+    phones = data.phones;
+    if (!Array.isArray(phones) || !phones.length) throw new Error("No demo digital keys are available.");
+    activePhone = phones[0].name.toLowerCase();
+    const phoneSelect = $("active-phone");
+    phones.forEach((phone) => phoneSelect.append(el("option", {
+      value: phone.name.toLowerCase(), text: `${phone.name} · ${phone.role}`
+    })));
+    phoneSelect.value = activePhone;
+    renderHolderOptions();
+    await refresh();
+    window.setInterval(refresh, 3000);
+  } catch (error) {
+    showNotice(error.message || "Could not load the dashboard.", "bad");
+    $("vehicle-name").textContent = "Vehicle unavailable";
+    $("keys").replaceChildren(el("div", { class: "empty-state", text: error.message }));
+  }
 })();
 </script>
 </body>
