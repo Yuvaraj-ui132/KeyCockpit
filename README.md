@@ -6,7 +6,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-![KeyCockpit Dashboard](docs/dashboard.png)
+![KeyCockpit Dashboard](docs/screenshot_dashboard.png)
 
 ---
 
@@ -412,3 +412,5 @@ Do not use this code to secure any real-world system without a thorough security
 ## License
 
 [MIT](LICENSE)
+
+
