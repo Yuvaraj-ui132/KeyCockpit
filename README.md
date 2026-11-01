@@ -6,8 +6,6 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-![KeyCockpit Dashboard](docs/dashboard.png)
-
 ---
 
 ## Overview
@@ -62,22 +60,6 @@ KeyCockpit implements both mechanisms with production-grade Ed25519 signatures a
 - **Driver profiles** — seat position, cabin temperature, music preset, and theme loaded per driver on unlock
 - **Phone projection** — nav, media, and call data pushed to the cockpit screen while the engine runs
 - **No build step** — the entire frontend is one HTML file; the backend is pure-Python with three dependencies
-
----
-
-## Screenshots
-
-### 1. Dashboard & Interactive Quickstart Guide
-![KeyCockpit Dashboard](docs/dashboard.png)
-
-### 2. Security Testing & Attack Lab
-![Security Testing & Attack Lab](docs/attack_lab.png)
-
-### 3. Digital Key Management & Inspection
-![Digital Key Management](docs/digital_keys.png)
-
-### 4. Driver Profiles & Cockpit Settings
-![Driver Profiles & Cockpit Settings](docs/driver_profiles.png)
 
 ---
 
@@ -145,12 +127,6 @@ static/
 tests/
   test_car.py              38 unit / security tests directly against the Car
   test_api.py              24 end-to-end tests through the ASGI interface
-
-docs/
-  dashboard.png            Interactive dashboard screenshot
-  attack_lab.png           Security testing & attack lab screenshot
-  digital_keys.png         Digital key management screenshot
-  driver_profiles.png      Driver profiles & cockpit settings screenshot
 
 demo.py                    Terminal walkthrough (no server needed)
 requirements.txt           Three dependencies: starlette, uvicorn, cryptography
