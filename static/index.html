@@ -262,6 +262,13 @@
     padding: 28px 0 60px;
   }
 
+  /* Single-Page Section Views */
+  .page-view {
+    display: none;
+  }
+  .page-view.active {
+    display: block;
+  }
   .page-view[hidden] {
     display: none !important;
   }
@@ -1253,88 +1260,88 @@
 
 <main class="container">
 
-  <!-- Getting Started Guide (Prominent & Expandable) -->
-  <section class="guide-card" id="getting-started-section">
-    <div class="guide-header">
-      <div>
-        <h2>
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          How to Use KeyCockpit
-        </h2>
-        <p>Follow these 6 interactive steps to master digital car key simulation and offline vehicle security.</p>
-      </div>
-      <button class="btn btn-secondary btn-sm" id="btn-dismiss-guide" type="button">Close Guide</button>
-    </div>
-
-    <div class="guide-steps-grid">
-      <div class="guide-step-item">
-        <div>
-          <div class="step-badge">1</div>
-          <h4>Understand the Simulator</h4>
-          <p>Learn what the smartphone and car represent. Your phone holds a secret cryptographic key; the car verifies it completely offline.</p>
-        </div>
-        <button class="btn btn-secondary btn-sm" type="button" onclick="openJargonModal()">Explore Concepts</button>
-      </div>
-
-      <div class="guide-step-item">
-        <div>
-          <div class="step-badge">2</div>
-          <h4>Issue a Digital Key</h4>
-          <p>Create a secure digital key for a driver with a specific role (Owner, Guest, or Valet) and an expiration window.</p>
-        </div>
-        <button class="btn btn-primary btn-sm" type="button" onclick="navigateTo('keys')">Issue a Key</button>
-      </div>
-
-      <div class="guide-step-item">
-        <div>
-          <div class="step-badge">3</div>
-          <h4>Connect to the Car</h4>
-          <p>Select which driver's phone is currently approaching the vehicle (e.g. Alice, Bob, or Valet).</p>
-        </div>
-        <button class="btn btn-secondary btn-sm" type="button" onclick="navigateTo('interaction')">Select Phone</button>
-      </div>
-
-      <div class="guide-step-item">
-        <div>
-          <div class="step-badge">4</div>
-          <h4>Test Car Access</h4>
-          <p>Attempt access commands: Unlock, Lock, Start Engine, or Open Trunk. Watch the car's offline verification checks.</p>
-        </div>
-        <button class="btn btn-success btn-sm" type="button" onclick="navigateTo('interaction')">Test Access</button>
-      </div>
-
-      <div class="guide-step-item">
-        <div>
-          <div class="step-badge">5</div>
-          <h4>Explore Security Tests</h4>
-          <p>Test real-world attack scenarios (replay, relay, forged certificates, stolen keys) and see how the car defends itself.</p>
-        </div>
-        <button class="btn btn-danger btn-sm" type="button" onclick="navigateTo('security')">Open Attack Lab</button>
-      </div>
-
-      <div class="guide-step-item">
-        <div>
-          <div class="step-badge">6</div>
-          <h4>Manage Digital Keys</h4>
-          <p>Inspect digital certificate payloads, check active expiration times, and instantly revoke keys if a phone is lost.</p>
-        </div>
-        <button class="btn btn-secondary btn-sm" type="button" onclick="navigateTo('keys')">Manage Keys</button>
-      </div>
-    </div>
-
-    <!-- Jargon Buster Bar -->
-    <div class="jargon-bar">
-      <div>
-        <strong>💡 Beginner Tip:</strong> Digital car keys replace physical key fobs using mathematical certificates. No internet connection is required by the vehicle!
-      </div>
-      <button class="btn btn-secondary btn-sm" type="button" onclick="openJargonModal()">View Friendly Glossary</button>
-    </div>
-  </section>
-
   <!-- ================================================================= -->
   <!-- PAGE 1: DASHBOARD VIEW                                            -->
   <!-- ================================================================= -->
-  <section class="page-view" id="view-dashboard">
+  <section class="page-view active" id="view-dashboard">
+    
+    <!-- Getting Started Guide (Prominent & Expandable) -->
+    <section class="guide-card" id="getting-started-section">
+      <div class="guide-header">
+        <div>
+          <h2>
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            How to Use KeyCockpit
+          </h2>
+          <p>Follow these 6 interactive steps to master digital car key simulation and offline vehicle security.</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btn-dismiss-guide" type="button">Close Guide</button>
+      </div>
+
+      <div class="guide-steps-grid">
+        <div class="guide-step-item">
+          <div>
+            <div class="step-badge">1</div>
+            <h4>Understand the Simulator</h4>
+            <p>Learn what the smartphone and car represent. Your phone holds a secret cryptographic key; the car verifies it completely offline.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="button" onclick="openJargonModal()">Explore Concepts</button>
+        </div>
+
+        <div class="guide-step-item">
+          <div>
+            <div class="step-badge">2</div>
+            <h4>Issue a Digital Key</h4>
+            <p>Create a secure digital key for a driver with a specific role (Owner, Guest, or Valet) and an expiration window.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="navigateTo('keys')">Issue a Key</button>
+        </div>
+
+        <div class="guide-step-item">
+          <div>
+            <div class="step-badge">3</div>
+            <h4>Connect to the Car</h4>
+            <p>Select which driver's phone is currently approaching the vehicle (e.g. Alice, Bob, or Valet).</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="button" onclick="navigateTo('interaction')">Select Phone</button>
+        </div>
+
+        <div class="guide-step-item">
+          <div>
+            <div class="step-badge">4</div>
+            <h4>Test Car Access</h4>
+            <p>Attempt access commands: Unlock, Lock, Start Engine, or Open Trunk. Watch the car's offline verification checks.</p>
+          </div>
+          <button class="btn btn-success btn-sm" type="button" onclick="navigateTo('interaction')">Test Access</button>
+        </div>
+
+        <div class="guide-step-item">
+          <div>
+            <div class="step-badge">5</div>
+            <h4>Explore Security Tests</h4>
+            <p>Test real-world attack scenarios (replay, relay, forged certificates, stolen keys) and see how the car defends itself.</p>
+          </div>
+          <button class="btn btn-danger btn-sm" type="button" onclick="navigateTo('security')">Open Attack Lab</button>
+        </div>
+
+        <div class="guide-step-item">
+          <div>
+            <div class="step-badge">6</div>
+            <h4>Manage Digital Keys</h4>
+            <p>Inspect digital certificate payloads, check active expiration times, and instantly revoke keys if a phone is lost.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="button" onclick="navigateTo('keys')">Manage Keys</button>
+        </div>
+      </div>
+
+      <!-- Jargon Buster Bar -->
+      <div class="jargon-bar">
+        <div>
+          <strong>💡 Beginner Tip:</strong> Digital car keys replace physical key fobs using mathematical certificates. No internet connection is required by the vehicle!
+        </div>
+        <button class="btn btn-secondary btn-sm" type="button" onclick="openJargonModal()">View Friendly Glossary</button>
+      </div>
+    </section>
     
     <!-- Quick Stats Bar -->
     <div class="stats-grid">
@@ -2294,13 +2301,30 @@
     }, 4500);
   }
 
-  // Navigation Controller
+  // Navigation Controller — Single-Page Section Switcher
   function navigateTo(viewId) {
-    document.querySelectorAll(".page-view").forEach(view => {
-      view.hidden = (view.id !== "view-" + viewId);
+    if (!viewId) return;
+
+    // 1. Hide all main navigation sections completely; show ONLY the active one
+    const allViews = document.querySelectorAll(".page-view");
+    allViews.forEach(view => {
+      const isTarget = (view.id === "view-" + viewId);
+      if (isTarget) {
+        view.classList.add("active");
+        view.removeAttribute("hidden");
+        view.style.display = "block";
+      } else {
+        view.classList.remove("active");
+        view.setAttribute("hidden", "");
+        view.style.display = "none";
+      }
     });
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-      if (btn.dataset.view === viewId) {
+
+    // 2. Highlight only the matching navigation button
+    const navButtons = document.querySelectorAll(".nav-btn");
+    navButtons.forEach(btn => {
+      const isMatch = (btn.dataset.view === viewId);
+      if (isMatch) {
         btn.classList.add("active");
         btn.setAttribute("aria-current", "page");
       } else {
@@ -2308,7 +2332,6 @@
         btn.removeAttribute("aria-current");
       }
     });
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
   window.navigateTo = navigateTo;
 
@@ -3025,14 +3048,17 @@
       $("label-seat-val").textContent = `${e.target.value}%`;
     });
 
-    // Guide collapse
+    // Guide collapse & toggle
     $("btn-dismiss-guide").addEventListener("click", () => {
-      $("getting-started-section").style.display = "none";
+      const g = $("getting-started-section");
+      if (g) g.style.display = "none";
     });
     $("btn-toggle-guide").addEventListener("click", () => {
+      navigateTo('dashboard');
       const g = $("getting-started-section");
-      g.style.display = g.style.display === "none" ? "block" : "none";
-      if (g.style.display !== "none") g.scrollIntoView({ behavior: "smooth" });
+      if (g) {
+        g.style.display = (g.style.display === "none") ? "block" : "none";
+      }
     });
 
     // Tour buttons
@@ -3056,6 +3082,7 @@
   // Application Bootstrap
   async function init() {
     setupEvents();
+    navigateTo('dashboard'); // Guarantee only Dashboard is displayed on initial load
     generateValidPhoneKey(); // pre-fill key issuance field
 
     try {
